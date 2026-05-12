@@ -7,6 +7,7 @@ const client = createClient({
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+
   const username = searchParams.get("username");
 
   const result = await client.execute({
@@ -22,7 +23,8 @@ export async function POST(request: Request) {
 
   await client.execute({
     sql: `
-      INSERT INTO tasks (username, title, dueDate, isRecurring, completed)
+      INSERT INTO tasks 
+      (username, title, dueDate, isRecurring, completed)
       VALUES (?, ?, ?, ?, ?)
     `,
     args: [
@@ -34,5 +36,7 @@ export async function POST(request: Request) {
     ],
   });
 
-  return NextResponse.json({ message: "Task added" });
+  return NextResponse.json({
+    message: "Task added",
+  });
 }
