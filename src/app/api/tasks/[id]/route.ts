@@ -11,15 +11,13 @@ export async function PATCH(
 ) {
   const { id } = await params;
 
-  const body = await request.json();
-
   await client.execute({
-    sql: "UPDATE tasks SET completed = ? WHERE id = ?",
-    args: [body.completed ? 1 : 0, id],
+    sql: "UPDATE tasks SET completed = 1 WHERE id = ?",
+    args: [id],
   });
 
   return NextResponse.json({
-    message: "Task updated",
+    message: "Task completed",
   });
 }
 
