@@ -1,66 +1,83 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Task = {
+  id: number;
+  title: string;
+  completed: number;
+};
 
 export default function Home() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+
+  useEffect(() => {
+    fetch("/api/tasks")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      setTasks(data);
+      setLoading(false);
+    });
+  }, []);
+
+  function handleAddTask(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    fetch("/api/tasks", {
+      method: "POST",
+      body: JSON.stringify({ title: newTaskTitle }),
+    }).then(() => {
+      setNewTaskTitle("");
+      window.location.reload();
+    });
+  }
+
+  function handleComplete(id: number) {
+    fetch(`/api/tasks/${id}`, {
+      method: "PATCH",
+    }).then(() => {
+      window.location.reload();
+    });
+  }
+
+  function handleDelete(id: number) {
+    fetch(`/api/tasks/${id}`, {
+      method: "DELETE",
+    }).then(() => {
+      window.location.reload();
+    });
+  }
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main>
+      <h1>Tasks</h1>
+
+      <form onSubmit={handleAddTask}>
+        <input type="text" value={newTaskTitle} onChange={(event) => 
+          setNewTaskTitle(event.target.value)} placeholder="Enter a new task" 
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <button type="submit" className="addButton">Add Task</button>
+      </form>
+
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            {task.completed ? "✔" : "☐"} {task.title}
+
+            {!task.completed && (
+            <button className="completeButton"onClick={() => handleComplete(task.id)}>Complete</button>
+            )}
+            <button className="deleteButton"onClick={() => handleDelete(task.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }
