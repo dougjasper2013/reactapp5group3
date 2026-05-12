@@ -57,7 +57,7 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Tasks</h1>
+      <h1>Tasks#2</h1>
 
       <form onSubmit={handleAddTask}>
         <input type="text" value={newTaskTitle} onChange={(event) => 
