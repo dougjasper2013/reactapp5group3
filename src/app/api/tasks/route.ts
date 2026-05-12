@@ -1,17 +1,27 @@
-import { getTasks, addTask } from "@/data/queries";
+import { createClient } from "@libsql/client";
+import { NextResponse } from "next/server";
 
+const client = createClient({
+  url: process.env.DB_URL || "file:src/data/tasks.db",
+});
 
 export async function GET() {
-  const tasks = await getTasks();
+  const result = await client.execute(
+    "SELECT * FROM tasks ORDER BY id DESC"
+  );
 
-  return Response.json(tasks);
+  return NextResponse.json(result.rows);
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
 
-  await addTask(body.title);
+  await client.execute({
+    sql: "INSERT INTO tasks (title, completed) VALUES (?, ?)",
+    args: [body.title, 0],
+  });
 
-  return Response.json({ ok: true });
+  return NextResponse.json({
+    message: "Task added",
+  });
 }
-

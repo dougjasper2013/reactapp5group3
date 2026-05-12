@@ -1,23 +1,38 @@
-import { completeTask, deleteTask } from "@/data/queries";
+import { createClient } from "@libsql/client";
+import { NextResponse } from "next/server";
+
+const client = createClient({
+  url: process.env.DB_URL || "file:src/data/tasks.db",
+});
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = Number((await params).id);
+  const { id } = await params;
 
-  await completeTask(id);
+  await client.execute({
+    sql: "UPDATE tasks SET completed = 1 WHERE id = ?",
+    args: [id],
+  });
 
-  return Response.json({ ok: true });
+  return NextResponse.json({
+    message: "Task completed",
+  });
 }
 
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = Number((await params).id);
+  const { id } = await params;
 
-  await deleteTask(id);
+  await client.execute({
+    sql: "DELETE FROM tasks WHERE id = ?",
+    args: [id],
+  });
 
-  return Response.json({ ok: true });
+  return NextResponse.json({
+    message: "Task deleted",
+  });
 }
