@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import TaskList from "@/components/TaskList";
 
 type Task = {
   id: number;
@@ -101,18 +102,11 @@ export default function Home() {
         <button type="submit" className="addButton">Add Task</button>
       </form>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            {task.completed ? "✔" : "☐"} {task.title}
-
-            {!task.completed && (
-            <button className="completeButton"onClick={() => handleComplete(task.id)}>Complete</button>
-            )}
-            <button className="deleteButton"onClick={() => handleDelete(task.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <TaskList
+        tasks={tasks}
+        onComplete={handleComplete}
+        onDelete={handleDelete}
+      />
     </main>
   );
 }
