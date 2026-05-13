@@ -17,8 +17,8 @@ export async function POST(request: Request) {
   const body = await request.json();
 
   await client.execute({
-    sql: "INSERT INTO tasks (title, completed) VALUES (?, ?)",
-    args: [body.title, 0],
+    sql: "INSERT INTO tasks (title, description, completed) VALUES (?, ?, ?)",
+    args: [body.title, body.description, 0],
   });
 
   return NextResponse.json({
