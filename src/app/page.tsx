@@ -2,53 +2,59 @@
 
 import { useEffect, useState } from "react";
 import TaskList from "@/components/TaskList";
+import TaskForm from "@/components/taskform";
+import { getTasks, updateTask, deleteTask } from "@/api";
 
 type Task = {
   id: number;
   title: string;
+  description: string;
   completed: number;
 };
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
 
-  useEffect(() => {
-    fetch("/api/tasks")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log(data);
+  async function fetchTasks() {
+    const res = await fetch("/api/tasks");
+    const data = await res.json();
+
+    setTasks(data);
+  }
+
+useEffect(() => {
+  async function loadTasks() {
+    try {
+      const res = await fetch("/api/tasks");
+      const data = await res.json();
+
       setTasks(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
-    });
-  }, []);
-
-  function handleAddTask(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    fetch("/api/tasks", {
-      method: "POST",
-      body: JSON.stringify({ title: newTaskTitle }),
-    }).then(() => {
-      setNewTaskTitle("");
-      window.location.reload();
-    });
+    }
   }
 
-  function handleComplete(id: number) {
-    fetch(`/api/tasks/${id}`, {
-      method: "PATCH",
-    }).then(() => {
-      window.location.reload();
-    });
-  }
+  loadTasks();
+}, []);
+
+
+
+function handleComplete(id: number) {
+  fetch(`/api/tasks/${id}`, {
+    method: "PATCH",
+  }).then(() => {
+    fetchTasks();
+  });
+}
 
   function handleDelete(id: number) {
     fetch(`/api/tasks/${id}`, {
       method: "DELETE",
     }).then(() => {
-      window.location.reload();
+      fetchTasks();
     });
   }
 
@@ -58,14 +64,9 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Tasks#2</h1>
+      <h1>Tasks</h1>
 
-      <form onSubmit={handleAddTask}>
-        <input type="text" value={newTaskTitle} onChange={(event) => 
-          setNewTaskTitle(event.target.value)} placeholder="Enter a new task" 
-        />
-        <button type="submit" className="addButton">Add Task</button>
-      </form>
+      <TaskForm onTaskAdded={fetchTasks} />
 
       <TaskList
         tasks={tasks}

@@ -3,6 +3,7 @@
 type Task = {
   id: number;
   title: string;
+  description: string;
   completed: number;
 };
 
@@ -15,14 +16,23 @@ type TaskItemProps = {
 export default function TaskItem({ task, onComplete, onDelete }: TaskItemProps) {
   return (
     <li>
-      {task.completed ? "✔" : "☐"} {task.title}
+      <div>
+        {task.completed ? "✔" : "☐"} Task: <strong>{task.title}</strong>
+
+      </div>
+
+      <div>
+        Description:
+        {task.description}
+      </div>
 
       {!task.completed && (
-        <button className="completeButton" onClick={() => onComplete(task.id)}>
+        <button onClick={() => onComplete(task.id)}>
           Complete
         </button>
       )}
-      <button className="deleteButton" onClick={() => onDelete(task.id)}>
+
+      <button onClick={() => onDelete(task.id)}>
         Delete
       </button>
     </li>
