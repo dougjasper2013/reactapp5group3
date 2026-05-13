@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import TaskList from "@/components/TaskList";
 import TaskForm from "@/components/taskform";
-import { getTasks, updateTask, deleteTask } from "@/api";
 
 type Task = {
   id: number;
@@ -23,39 +22,45 @@ export default function Home() {
     setTasks(data);
   }
 
-useEffect(() => {
-  async function loadTasks() {
-    try {
-      const res = await fetch("/api/tasks");
-      const data = await res.json();
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        const res = await fetch("/api/tasks");
+        const data = await res.json();
 
-      setTasks(data);
+        setTasks(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTasks();
+  }, []);
+
+  async function handleComplete(id: number) {
+    try {
+      await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+      });
+
+      fetchTasks();
     } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+      console.error("Error completing task:", error);
     }
   }
 
-  loadTasks();
-}, []);
+  async function handleDelete(id: number) {
+    try {
+      await fetch(`/api/tasks/${id}`, {
+        method: "DELETE",
+      });
 
-
-
-function handleComplete(id: number) {
-  fetch(`/api/tasks/${id}`, {
-    method: "PATCH",
-  }).then(() => {
-    fetchTasks();
-  });
-}
-
-  function handleDelete(id: number) {
-    fetch(`/api/tasks/${id}`, {
-      method: "DELETE",
-    }).then(() => {
       fetchTasks();
-    });
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   }
 
   if (loading) {

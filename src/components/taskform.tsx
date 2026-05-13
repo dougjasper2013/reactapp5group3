@@ -18,7 +18,10 @@ export default function TaskForm({ onTaskAdded }: TaskFormProps) {
       alert("Please enter a task title");
       return;
     }
-
+    if (!description.trim()) {
+      alert("Please enter a task description");
+      return;
+    }
     try {
       await fetch("/api/tasks", {
         method: "POST",
@@ -53,6 +56,7 @@ export default function TaskForm({ onTaskAdded }: TaskFormProps) {
 
       <input
         type="text"
+        placeholder="Enter task description"
         value={description}
         onChange={(event) => setDescription(event.target.value)}
       />

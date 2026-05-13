@@ -6,7 +6,7 @@ export async function getTasks() {
   });
 
   const data = await client.execute(
-    "SELECT id, title, completed FROM tasks"
+    "SELECT id, title, description, completed FROM tasks"
   );
 
   client.close();
@@ -14,14 +14,14 @@ export async function getTasks() {
   return data.rows;
 }
 
-export async function addTask(title: string) {
+export async function addTask(title: string, description: string) {
   const client = createClient({
     url: process.env.DB_URL ?? "",
   });
 
   await client.execute({
-    sql: "INSERT INTO tasks (title, completed) VALUES (?, 0)",
-    args: [title],
+    sql: "INSERT INTO tasks (title, description, completed) VALUES (?, ?, 0)",
+    args: [title, description],
   });
 
   client.close();
