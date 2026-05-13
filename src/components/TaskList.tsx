@@ -5,6 +5,7 @@ import TaskItem from "./TaskItem";
 type Task = {
   id: number;
   title: string;
+  description: string;
   completed: number;
 };
 

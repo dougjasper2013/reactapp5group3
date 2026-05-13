@@ -7,32 +7,27 @@ const client = createClient({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
+  const id = Number(params.id);
 
-  await client.execute({
-    sql: "UPDATE tasks SET completed = 1 WHERE id = ?",
+  // get current task
+  const result = await client.execute({
+    sql: "SELECT completed FROM tasks WHERE id = ?",
     args: [id],
   });
 
-  return NextResponse.json({
-    message: "Task completed",
-  });
-}
+  const current = result.rows[0]?.completed ?? 0;
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+  const newValue = current === 1 ? 0 : 1;
 
   await client.execute({
-    sql: "DELETE FROM tasks WHERE id = ?",
-    args: [id],
+    sql: "UPDATE tasks SET completed = ? WHERE id = ?",
+    args: [newValue, id],
   });
 
   return NextResponse.json({
-    message: "Task deleted",
+    id,
+    completed: newValue,
   });
 }

@@ -4,10 +4,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import TaskList from "@/components/TaskList";
+import TaskForm from "@/components/taskform";
+import { getTasks, updateTask, deleteTask } from "@/api";
 
 type Task = {
   id: number;
   title: string;
+  description: string;
   completed: number;
 };
 
@@ -19,6 +22,7 @@ type User = {
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
+<<<<<<< HEAD
   const [loading, setLoading] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   // Stores authenticated user information
@@ -35,8 +39,29 @@ export default function Home() {
     .then((res) => res.json())
     .then((data) => {
       console.log(data);
+=======
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTasks() {
+    const res = await fetch("/api/tasks");
+    const data = await res.json();
+
+    setTasks(data);
+  }
+
+useEffect(() => {
+  async function loadTasks() {
+    try {
+      const res = await fetch("/api/tasks");
+      const data = await res.json();
+
+>>>>>>> 0fd149b (changedpagetsx)
       setTasks(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setLoading(false);
+<<<<<<< HEAD
     });
   }, [user]);  
 
@@ -57,16 +82,26 @@ export default function Home() {
         window.location.reload();
       });
     }
-
-  function handleComplete(id: number) {
-    fetch(`/api/tasks/${id}`, {
-      method: "PATCH",
-    }).then(() => {
-      window.location.reload();
-    });
+=======
+    }
   }
+>>>>>>> 0fd149b (changedpagetsx)
+
+  loadTasks();
+}, []);
+
+
+
+function handleComplete(id: number) {
+  fetch(`/api/tasks/${id}`, {
+    method: "PATCH",
+  }).then(() => {
+    fetchTasks();
+  });
+}
 
   function handleDelete(id: number) {
+<<<<<<< HEAD
       fetch(`/api/tasks/${id}`, {
         method: "DELETE",
       }).then(() => {
@@ -82,6 +117,13 @@ export default function Home() {
         <Link href="/login">Go to Login</Link>
       </main>
     );
+=======
+    fetch(`/api/tasks/${id}`, {
+      method: "DELETE",
+    }).then(() => {
+      fetchTasks();
+    });
+>>>>>>> 0fd149b (changedpagetsx)
   }
 
   if (loading) {
@@ -90,8 +132,9 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Tasks#2</h1>
+      <h1>Tasks</h1>
 
+<<<<<<< HEAD
       <p>Welcome, {user.name}</p>
       <button onClick={handleLogout}>Logout</button>
 
@@ -101,6 +144,9 @@ export default function Home() {
         />
         <button type="submit" className="addButton">Add Task</button>
       </form>
+=======
+      <TaskForm onTaskAdded={fetchTasks} />
+>>>>>>> 0fd149b (changedpagetsx)
 
       <TaskList
         tasks={tasks}
