@@ -7,27 +7,73 @@ const client = createClient({
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = Number(params.id);
+  try {
+    const { id } = await params;
 
-  // get current task
-  const result = await client.execute({
-    sql: "SELECT completed FROM tasks WHERE id = ?",
-    args: [id],
-  });
+    const taskId = Number(id);
 
-  const current = result.rows[0]?.completed ?? 0;
+    const result = await client.execute({
+      sql: "SELECT completed FROM tasks WHERE id = ?",
+      args: [taskId],
+    });
 
-  const newValue = current === 1 ? 0 : 1;
+    if (result.rows.length === 0) {
+      return NextResponse.json(
+        { error: "Task not found" },
+        { status: 404 }
+      );
+    }
 
-  await client.execute({
-    sql: "UPDATE tasks SET completed = ? WHERE id = ?",
-    args: [newValue, id],
-  });
+    const current = Number(result.rows[0].completed);
 
-  return NextResponse.json({
-    id,
-    completed: newValue,
-  });
+    const newValue = current === 1 ? 0 : 1;
+
+    await client.execute({
+      sql: "UPDATE tasks SET completed = ? WHERE id = ?",
+      args: [newValue, taskId],
+    });
+
+    return NextResponse.json({
+      id: taskId,
+      completed: newValue,
+    });
+  } catch (error) {
+    console.error("PATCH ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const taskId = Number(id);
+
+    console.log("DELETE ID:", taskId);
+
+    await client.execute({
+      sql: "DELETE FROM tasks WHERE id = ?",
+      args: [taskId],
+    });
+
+    return NextResponse.json({
+      message: "Task deleted",
+    });
+  } catch (error) {
+    console.error("DELETE ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500 }
+    );
+  }
 }

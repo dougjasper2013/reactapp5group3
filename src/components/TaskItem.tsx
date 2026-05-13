@@ -1,3 +1,4 @@
+
 "use client";
 
 type Task = {
@@ -13,17 +14,19 @@ type TaskItemProps = {
   onDelete: (id: number) => void;
 };
 
-export default function TaskItem({ task, onComplete, onDelete }: TaskItemProps) {
+export default function TaskItem({
+  task,
+  onComplete,
+  onDelete,
+}: TaskItemProps) {
   return (
-    <li>
+    <li className={task.completed ? "completed" : ""}>
       <div>
-        {task.completed ? "✔" : "☐"} Task: <strong>{task.title}</strong>
-
+        <strong>Task:</strong> {task.completed ? "✔ " : "☐ "}{task.title}
       </div>
 
       <div>
-        Description:
-        {task.description}
+        <strong>Description:</strong> {task.description}
       </div>
 
       {!task.completed && (
