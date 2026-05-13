@@ -40,7 +40,6 @@ export default function TaskForm({ onTaskAdded }: TaskFormProps) {
       setTitle("");
       setDueDate("");
       setIsRecurring(false);
-
       onTaskAdded();
     } catch (error) {
       console.error("Error adding task:", error);
@@ -49,14 +48,18 @@ export default function TaskForm({ onTaskAdded }: TaskFormProps) {
 
   return (
     <form className="task-form" onSubmit={handleSubmit}>
+      <label htmlFor="taskTitle">Task Title</label>
       <input
+        id="taskTitle"
         type="text"
         placeholder="Enter task title"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
       />
 
+      <label htmlFor="dueDate">Due Date</label>
       <input
+        id="dueDate"
         type="date"
         value={dueDate}
         onChange={(event) => setDueDate(event.target.value)}
